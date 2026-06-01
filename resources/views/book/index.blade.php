@@ -367,11 +367,6 @@
                             <p class="metadata-label">Language</p>
                             <p class="metadata-value">{{ $book->language }}</p>
                         </div>
-
-                        <div class="metadata-item">
-                            <p class="metadata-label">Total Copies</p>
-                            <p class="metadata-value">{{ $copies->count() }}</p>
-                        </div>
                     </div>
 
                     @auth
