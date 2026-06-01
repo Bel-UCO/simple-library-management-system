@@ -2,24 +2,37 @@
 
 namespace Database\Seeders;
 
+use App\Models\BookCategory;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::updateOrCreate(
+            ['email' => 'admin@mail.com'],
+            [
+                'name' => 'Admin Library',
+                'password' => Hash::make('password'),
+                'phone' => '081234567890',
+                'address' => 'Library Office',
+                'status' => 'active',
+                'is_admin' => true,
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'member@mail.com'],
+            [
+                'name' => 'Member Library',
+                'password' => Hash::make('password'),
+                'phone' => '081234567891',
+                'address' => 'Member Address',
+                'status' => 'active',
+                'is_admin' => false,
+            ]
+        );
     }
 }
