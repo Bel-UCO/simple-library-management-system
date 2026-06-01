@@ -17,13 +17,13 @@ Route::get('/register', [RegisterController::class, 'index'])->name('register.in
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store'); // Handle registration form submission
 
 
-Route::get('/login', [LoginController::class, 'index'])->name('login.index');
-Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/login', [LoginController::class, 'index'])->name('login.index'); // Show login form
+Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate'); // Handle login form submission
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout'); // Handle logout
 
 Route::middleware(['auth', 'can:is-member'])->group(function () {
-    Route::get('/setting', [LoginController::class, 'setting'])->name('login.setting');
-    Route::post('/setting/password', [LoginController::class, 'updatePassword'])->name('login.update-password');
+    Route::get('/setting', [LoginController::class, 'setting'])->name('login.setting'); // Show account settings form (e.g., change password)
+    Route::post('/setting/password', [LoginController::class, 'updatePassword'])->name('login.update-password'); // Handle password update form submission
 });
 
 Route::prefix('books')
@@ -65,8 +65,8 @@ Route::prefix('categories')
     ->controller(BookCategoryController::class)
     ->middleware(['auth', 'can:is-admin'])
     ->group(function () {
-        Route::get('/', 'index')->name('categories.list');
-        Route::post('/store', 'store')->name('categories.store');
-        Route::post('/update/{id}', 'update')->name('categories.update');
-        Route::post('/destroy/{id}', 'destroy')->name('categories.destroy');
+        Route::get('/', 'index')->name('categories.list'); // List all categories
+        Route::post('/store', 'store')->name('categories.store'); // Handle form submission to create a new category
+        Route::post('/update/{id}', 'update')->name('categories.update'); // Handle form submission to update an existing category
+        Route::post('/destroy/{id}', 'destroy')->name('categories.destroy'); // Handle category deletion
     });

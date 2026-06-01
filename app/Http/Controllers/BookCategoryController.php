@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class BookCategoryController extends Controller
 {
+    // Display a list of all book categories
     public function index()
     {
         $categories = BookCategory::latest()->get();
@@ -14,6 +15,7 @@ class BookCategoryController extends Controller
         return view('categories.index', compact('categories'));
     }
 
+    // Show the form to create a new book category
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -26,6 +28,8 @@ class BookCategoryController extends Controller
             ->route('categories.list')
             ->with('success', 'Category created successfully.');
     }
+
+    // Show the form to edit an existing book category
 
     public function update(Request $request, $id)
     {
@@ -42,6 +46,7 @@ class BookCategoryController extends Controller
             ->with('success', 'Category updated successfully.');
     }
 
+    // Delete a book category
     public function destroy($id)
     {
         $category = BookCategory::findOrFail($id);

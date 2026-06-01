@@ -33,6 +33,8 @@ class BorrowedLogController extends Controller
         return view('admin.issue.index', compact('members', 'availableCopies', 'histories'));
     }
 
+
+    // Handle the borrowing of a book
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -41,11 +43,15 @@ class BorrowedLogController extends Controller
             'borrowed_date' => 'required|date',
         ]);
 
+        // Check if the member is active and has not exceeded the borrowing limit
+
         $bookBorrowed = User::where('id', $validated['user_id'])
             ->where('is_admin', false)
             ->where('status', 'active')
             ->first();
 
+
+        // Check if the member is active
         if (!$bookBorrowed) {
             return back()
                 ->withErrors([
@@ -54,6 +60,7 @@ class BorrowedLogController extends Controller
                 ->withInput();
         }
 
+        // Check if the member has already borrowed 3 books that are not yet returned
         $activeBorrowCount = $bookBorrowed->borrowedLogs()
             ->whereNull('returned_date')
             ->count();
@@ -66,6 +73,8 @@ class BorrowedLogController extends Controller
                 ->withInput();
         }
 
+
+        // Check if the book copy is available
         $bookCopy = BookCopy::where('id', $validated['book_copy_id'])
             ->where('status', 'available')
             ->first();
@@ -78,6 +87,7 @@ class BorrowedLogController extends Controller
                 ->withInput();
         }
 
+        // Use a transaction to ensure data integrity
         DB::transaction(function () use ($validated, $bookCopy) {
             BorrowedLog::create([
                 'user_id' => $validated['user_id'],
@@ -97,6 +107,7 @@ class BorrowedLogController extends Controller
             ->with('success', 'Book borrowed successfully.');
     }
 
+    //  Show the form to return a book
     public function returnForm()
     {
         $borrowedLogs = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
@@ -116,6 +127,7 @@ class BorrowedLogController extends Controller
         return view('admin.return.index', compact('borrowedLogs', 'returnHistories'));
     }
 
+    // Handle the returning of a book
     public function returnBook(Request $request)
     {
         $validated = $request->validate([
@@ -123,6 +135,7 @@ class BorrowedLogController extends Controller
             'returned_date' => 'required|date',
         ]);
 
+        // Find the borrowed log entry and ensure it is valid for return
         $borrowedLog = BorrowedLog::with('bookCopy')
             ->whereNull('returned_date')
             ->whereHas('bookCopy', function ($query) {
@@ -130,6 +143,7 @@ class BorrowedLogController extends Controller
             })
             ->findOrFail($validated['borrowed_log_id']);
 
+        //  Use a transaction to ensure data integrity when updating the borrowed log and book copy status
         DB::transaction(function () use ($validated, $borrowedLog) {
             $borrowedLog->update([
                 'returned_date' => $validated['returned_date'],
