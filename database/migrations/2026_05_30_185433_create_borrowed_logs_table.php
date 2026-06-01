@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('book_copy_id')->constrained('book_copies');
-            $table->date('date_borrowed');
+            $table->date('borrowed_date');
             $table->date('due_date');
-            $table->date('date_returned')->nullable();
+            $table->date('returned_date')->nullable();
             $table->timestamps();
         });
     }

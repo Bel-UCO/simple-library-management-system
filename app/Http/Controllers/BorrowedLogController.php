@@ -38,7 +38,7 @@ class BorrowedLogController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'book_copy_id' => 'required|exists:book_copies,id',
-            'date_borrowed' => 'required|date',
+            'borrowed_date' => 'required|date',
         ]);
 
         $bookBorrowed = User::where('id', $validated['user_id'])
@@ -55,7 +55,7 @@ class BorrowedLogController extends Controller
         }
 
         $activeBorrowCount = $bookBorrowed->borrowedLogs()
-            ->whereNull('date_returned')
+            ->whereNull('returned_date')
             ->count();
 
         if ($activeBorrowCount >= 3) {
@@ -82,9 +82,9 @@ class BorrowedLogController extends Controller
             BorrowedLog::create([
                 'user_id' => $validated['user_id'],
                 'book_copy_id' => $validated['book_copy_id'],
-                'date_borrowed' => $validated['date_borrowed'],
-                'due_date' => Carbon::parse($validated['date_borrowed'])->addDays(7)->toDateString(),
-                'date_returned' => null,
+                'borrowed_date' => $validated['borrowed_date'],
+                'due_date' => Carbon::parse($validated['borrowed_date'])->addDays(7)->toDateString(),
+                'returned_date' => null,
             ]);
 
             $bookCopy->update([
@@ -100,7 +100,7 @@ class BorrowedLogController extends Controller
     public function returnForm()
     {
         $borrowedLogs = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
-            ->whereNull('date_returned')
+            ->whereNull('returned_date')
             ->whereHas('bookCopy', function ($query) {
                 $query->where('status', 'borrowed');
             })
@@ -108,7 +108,7 @@ class BorrowedLogController extends Controller
             ->get();
 
         $returnHistories = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
-            ->whereNotNull('date_returned')
+            ->whereNotNull('returned_date')
             ->latest()
             ->take(20)
             ->get();
@@ -120,11 +120,11 @@ class BorrowedLogController extends Controller
     {
         $validated = $request->validate([
             'borrowed_log_id' => 'required|exists:borrowed_logs,id',
-            'date_returned' => 'required|date',
+            'returned_date' => 'required|date',
         ]);
 
         $borrowedLog = BorrowedLog::with('bookCopy')
-            ->whereNull('date_returned')
+            ->whereNull('returned_date')
             ->whereHas('bookCopy', function ($query) {
                 $query->where('status', 'borrowed');
             })
@@ -132,7 +132,7 @@ class BorrowedLogController extends Controller
 
         DB::transaction(function () use ($validated, $borrowedLog) {
             $borrowedLog->update([
-                'date_returned' => $validated['date_returned'],
+                'returned_date' => $validated['returned_date'],
             ]);
 
             $borrowedLog->bookCopy->update([

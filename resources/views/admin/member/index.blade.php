@@ -319,9 +319,9 @@
                                 <tr>
                                     <td>{{ $history->id }}</td>
                                     <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
-                                    <td>{{ $history->date_borrowed ?? '-' }}</td>
+                                    <td>{{ $history->borrowed_date ?? '-' }}</td>
                                     <td>{{ $history->due_date ?? '-' }}</td>
-                                    <td>{{ $history->date_returned ?? '-' }}</td>
+                                    <td>{{ $history->returned_date ?? '-' }}</td>
                                     <td>{{ $history->status ?? '-' }}</td>
                                 </tr>
                             @endforeach

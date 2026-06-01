@@ -9,9 +9,9 @@ class BorrowedLog extends Model
     protected $fillable = [
         'user_id',
         'book_copy_id',
-        'date_borrowed',
+        'borrowed_date',
         'due_date',
-        'date_returned',
+        'returned_date',
     ];
 
     public function user() {

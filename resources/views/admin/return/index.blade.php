@@ -208,16 +208,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="date_returned" class="form-label">Returned Date</label>
+                    <label for="returned_date" class="form-label">Returned Date</label>
                     <input
                         type="date"
-                        name="date_returned"
-                        id="date_returned"
-                        value="{{ old('date_returned', date('Y-m-d')) }}"
+                        name="returned_date"
+                        id="returned_date"
+                        value="{{ old('returned_date', date('Y-m-d')) }}"
                         class="form-input"
                     >
 
-                    @error('date_returned')
+                    @error('returned_date')
                         <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
@@ -252,8 +252,8 @@
                                 <td>{{ $history->user->name ?? 'Unknown Member' }}</td>
                                 <td>{{ $history->bookCopy->id ?? '-' }}</td>
                                 <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
-                                <td>{{ $history->date_borrowed ?? '-' }}</td>
-                                <td>{{ $history->date_returned ?? '-' }}</td>
+                                <td>{{ $history->borrowed_date ?? '-' }}</td>
+                                <td>{{ $history->returned_date ?? '-' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

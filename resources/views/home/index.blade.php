@@ -198,7 +198,7 @@
                                         </h3>
 
                                         <p class="book-meta">
-                                            Borrowed Date: {{ $history->date_borrowed ?? '-' }}
+                                            Borrowed Date: {{ $history->borrowed_date ?? '-' }}
                                         </p>
 
                                         <p class="book-meta">
@@ -300,7 +300,7 @@
                                             </h3>
 
                                             <p class="book-meta">
-                                                Borrowed Date: {{ $history->date_borrowed ?? '-' }}
+                                                Borrowed Date: {{ $history->borrowed_date ?? '-' }}
                                             </p>
 
                                             <p class="book-meta">

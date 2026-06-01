@@ -65,7 +65,7 @@ class MemberController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.members.index', compact('members', 'selectedMember', 'histories', 'searchBy', 'keyword'));
+        return view('admin.member.index', compact('members', 'selectedMember', 'histories', 'searchBy', 'keyword'));
     }
 
     public function updateStatus(Request $request, $id)

@@ -58,7 +58,7 @@ class LoginController extends Controller
 
         // Check if the authenticated user has overdue books
         $hasOverdueBooks = BorrowedLog::where('user_id', $user->id)
-            ->whereNull('date_returned')
+            ->whereNull('returned_date')
             ->whereDate('due_date', '<', today())
             ->exists();
 
