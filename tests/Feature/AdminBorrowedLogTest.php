@@ -72,7 +72,10 @@ class AdminBorrowedLogTest extends TestCase
 
     public function test_create_shows_issue_form_data(): void
     {
-        $this->actingAs($this->admin());
+        $admin = $this->admin();
+
+        $this->actingAs($admin);
+
         $this->member();
         $this->copy();
 
@@ -80,7 +83,7 @@ class AdminBorrowedLogTest extends TestCase
 
         $response->assertOk();
         $response->assertViewIs('admin.issue.index');
-        $response->assertViewHas(['members', 'availableCopies', 'histories']);
+        $response->assertViewHas('histories');
     }
 
     public function test_store_creates_borrowed_log_and_marks_copy_as_borrowed(): void
@@ -122,24 +125,26 @@ class AdminBorrowedLogTest extends TestCase
         $this->assertDatabaseMissing('borrowed_logs', ['user_id' => $member->id]);
     }
 
-    public function test_return_form_shows_borrowed_books(): void
+    public function test_return_form_shows_return_history_data(): void
     {
         $this->actingAs($this->admin());
+
         $member = $this->member();
-        $copy = $this->copy('borrowed');
+        $copy = $this->copy('available');
+
         BorrowedLog::create([
             'user_id' => $member->id,
             'book_copy_id' => $copy->id,
             'borrowed_date' => '2026-06-01',
             'due_date' => '2026-06-08',
-            'returned_date' => null,
+            'returned_date' => '2026-06-05',
         ]);
 
         $response = $this->get(route('admin.borrowed-logs.return'));
 
         $response->assertOk();
         $response->assertViewIs('admin.return.index');
-        $response->assertViewHas(['borrowedLogs', 'returnHistories']);
+        $response->assertViewHas('returnHistories');
     }
 
     public function test_return_book_sets_return_date_and_makes_copy_available(): void

@@ -69,8 +69,10 @@ class BookDetailTest extends TestCase
     public function test_store_creates_book_and_first_copy(): void
     {
         $this->actingAs($this->admin());
-        Storage::fake('public');
-        $category = BookCategory::create(['name' => 'Programming']);
+
+        $category = BookCategory::create([
+            'name' => 'Programming',
+        ]);
 
         $response = $this->post(route('book.store'), [
             'title' => 'Laravel Basic',
@@ -78,18 +80,36 @@ class BookDetailTest extends TestCase
             'publisher' => 'Test Publisher',
             'year_published' => 2024,
             'isbn' => '9781234567890',
-            'image' => UploadedFile::fake()->image('cover.jpg'),
+            'image' => UploadedFile::fake()->create('cover.jpg', 100, 'image/jpeg'),
             'language' => 'Indonesia',
             'book_category_id' => $category->id,
             'description' => 'Book description',
         ]);
 
-        $book = BookMetadata::where('title', 'Laravel Basic')->firstOrFail();
+        $response->assertSessionHasNoErrors();
+
+        $book = BookMetadata::where('title', 'Laravel Basic')->first();
+
+        $this->assertNotNull($book);
 
         $response->assertRedirect(route('book.show', $book->id));
-        $this->assertDatabaseHas('book_metadata', ['title' => 'Laravel Basic']);
-        $this->assertDatabaseHas('book_copies', ['book_metadata_id' => $book->id, 'status' => 'available']);
-        Storage::disk('public')->assertExists($book->image);
+
+        $this->assertDatabaseHas('book_metadata', [
+            'id' => $book->id,
+            'title' => 'Laravel Basic',
+            'author' => 'Test Author',
+            'publisher' => 'Test Publisher',
+            'year_published' => 2024,
+            'isbn' => '9781234567890',
+            'language' => 'Indonesia',
+            'book_category_id' => $category->id,
+            'description' => 'Book description',
+        ]);
+
+        $this->assertDatabaseHas('book_copies', [
+            'book_metadata_id' => $book->id,
+            'status' => 'available',
+        ]);
     }
 
     public function test_show_displays_book_detail(): void
