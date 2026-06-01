@@ -179,45 +179,41 @@
             <p class="page-subtitle">Record a book borrowing transaction for a member.</p>
 
             @if (session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
+            <div class="success-message">
+                {{ session('success') }}
+            </div>
             @endif
 
             <form method="POST" action="{{ route('admin.borrowed-logs.store') }}">
                 @csrf
 
                 <div class="form-group">
-                    <label for="user_id" class="form-label">Member</label>
-                    <select name="user_id" id="user_id" class="form-select">
-                        <option value="">Select member</option>
-
-                        @foreach ($members as $member)
-                            <option value="{{ $member->id }}" {{ old('user_id') == $member->id ? 'selected' : '' }}>
-                                {{ $member->id }} - {{ $member->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label for="user_id" class="form-label">Member ID</label>
+                    <input
+                        type="number"
+                        name="user_id"
+                        id="user_id"
+                        value="{{ old('user_id') }}"
+                        class="form-input"
+                        placeholder="Enter member ID">
 
                     @error('user_id')
-                        <p class="error-message">{{ $message }}</p>
+                    <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="form-group">
-                    <label for="book_copy_id" class="form-label">Available Book Copy</label>
-                    <select name="book_copy_id" id="book_copy_id" class="form-select">
-                        <option value="">Select available book copy</option>
-
-                        @foreach ($availableCopies as $copy)
-                            <option value="{{ $copy->id }}" {{ old('book_copy_id') == $copy->id ? 'selected' : '' }}>
-                                Copy ID: {{ $copy->id }} - {{ $copy->bookMetadata->title ?? 'Unknown Book' }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label for="book_copy_id" class="form-label">Book Copy ID</label>
+                    <input
+                        type="number"
+                        name="book_copy_id"
+                        id="book_copy_id"
+                        value="{{ old('book_copy_id') }}"
+                        class="form-input"
+                        placeholder="Enter available book copy ID">
 
                     @error('book_copy_id')
-                        <p class="error-message">{{ $message }}</p>
+                    <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -228,11 +224,10 @@
                         name="borrowed_date"
                         id="borrowed_date"
                         value="{{ old('borrowed_date', date('Y-m-d')) }}"
-                        class="form-input"
-                    >
+                        class="form-input">
 
                     @error('borrowed_date')
-                        <p class="error-message">{{ $message }}</p>
+                    <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -247,33 +242,33 @@
             <h2 class="history-title">Borrowing History</h2>
 
             @if ($histories->count() > 0)
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Member ID</th>
-                            <th>Member Name</th>
-                            <th>Book Copy ID</th>
-                            <th>Book Name</th>
-                            <th>Borrowed Date</th>
-                        </tr>
-                    </thead>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Member ID</th>
+                        <th>Member Name</th>
+                        <th>Book Copy ID</th>
+                        <th>Book Name</th>
+                        <th>Borrowed Date</th>
+                    </tr>
+                </thead>
 
-                    <tbody>
-                        @foreach ($histories as $history)
-                            <tr>
-                                <td>{{ $history->user->id ?? '-' }}</td>
-                                <td>{{ $history->user->name ?? 'Unknown Member' }}</td>
-                                <td>{{ $history->bookCopy->id ?? '-' }}</td>
-                                <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
-                                <td>{{ $history->borrowed_date ?? '-' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <tbody>
+                    @foreach ($histories as $history)
+                    <tr>
+                        <td>{{ $history->user->id ?? '-' }}</td>
+                        <td>{{ $history->user->name ?? 'Unknown Member' }}</td>
+                        <td>{{ $history->bookCopy->id ?? '-' }}</td>
+                        <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
+                        <td>{{ $history->borrowed_date ?? '-' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
             @else
-                <div class="empty-message">
-                    No borrowing history yet.
-                </div>
+            <div class="empty-message">
+                No borrowing history yet.
+            </div>
             @endif
         </div>
     </div>

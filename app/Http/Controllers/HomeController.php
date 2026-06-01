@@ -61,7 +61,7 @@ class HomeController extends Controller
                 $query->where('book_category_id', $selectedCategory);
             })
             ->when($keyword, function ($query) use ($searchBy, $keyword) {
-                $query->where($searchBy, 'ilike', '%' . $keyword . '%');
+                $query->where($searchBy, 'like', '%' . $keyword . '%');
             })
             ->latest()
             ->paginate(20)

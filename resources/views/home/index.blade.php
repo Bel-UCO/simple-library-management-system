@@ -96,6 +96,34 @@
             justify-content: space-between;
         }
 
+        .book-image-wrapper {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+        }
+
+        .book-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .book-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
         .book-title {
             margin: 0 0 10px;
             color: #1e293b;
@@ -150,9 +178,9 @@
     </style>
 
     @php
-        $currentCategory = $categories->firstWhere('id', $selectedCategory);
-        $isHistoryMode = request('view') === 'history';
-        $isResultMode = $keyword || $selectedCategory || $isHistoryMode;
+    $currentCategory = $categories->firstWhere('id', $selectedCategory);
+    $isHistoryMode = request('view') === 'history';
+    $isResultMode = $keyword || $selectedCategory || $isHistoryMode;
     @endphp
 
     <div class="home-layout">
@@ -162,199 +190,239 @@
             <div class="category-list">
                 <a
                     href="{{ route('home') }}"
-                    class="category-link {{ !$selectedCategory ? 'active' : '' }}"
-                >
+                    class="category-link {{ !$selectedCategory ? 'active' : '' }}">
                     All Categories
                 </a>
 
                 @foreach ($categories as $category)
-                    <a
-                        href="{{ route('home', ['category' => $category->id]) }}"
-                        class="category-link {{ $selectedCategory == $category->id ? 'active' : '' }}"
-                    >
-                        {{ $category->name }}
-                    </a>
+                <a
+                    href="{{ route('home', ['category' => $category->id]) }}"
+                    class="category-link {{ $selectedCategory == $category->id ? 'active' : '' }}">
+                    {{ $category->name }}
+                </a>
                 @endforeach
             </div>
         </aside>
 
         <div class="content">
             @if ($isHistoryMode)
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <h1 class="section-title">History</h1>
-                            <p class="section-subtitle">Showing your borrowing history</p>
-                        </div>
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">History</h1>
+                        <p class="section-subtitle">Showing your borrowing history</p>
                     </div>
+                </div>
 
-                    @if ($historyPage->count() > 0)
-                        <div class="book-grid">
-                            @foreach ($historyPage as $history)
-                                <div class="book-card">
-                                    <div>
-                                        <h3 class="book-title">
-                                            {{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}
-                                        </h3>
-
-                                        <p class="book-meta">
-                                            Borrowed Date: {{ $history->borrowed_date ?? '-' }}
-                                        </p>
-
-                                        <p class="book-meta">
-                                            Due Date: {{ $history->due_date ?? '-' }}
-                                        </p>
-
-                                        <p class="book-meta">
-                                            Status: {{ $history->status ?? '-' }}
-                                        </p>
+                @if ($historyPage->count() > 0)
+                <div class="book-grid">
+                    @foreach ($historyPage as $history)
+                    <div class="book-card">
+                        <div>
+                            <div>
+                                <div class="book-image-wrapper">
+                                    @if (!empty($history->bookCopy->bookMetadata->image))
+                                    <img
+                                        src="{{ asset('storage/' . $history->bookCopy->bookMetadata->image) }}"
+                                        alt="{{ $history->bookCopy->bookMetadata->image }}"
+                                        class="book-image">
+                                    @else
+                                    <div class="book-image-placeholder">
+                                        No Image
                                     </div>
-
-                                    @if ($history->bookCopy && $history->bookCopy->bookMetadata)
-                                        <a
-                                            href="{{ route('book.show', $history->bookCopy->bookMetadata->id) }}"
-                                            class="book-link"
-                                        >
-                                            View Detail
-                                        </a>
                                     @endif
                                 </div>
-                            @endforeach
+                                <h3 class="book-title">
+                                    {{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}
+                                </h3>
+
+                                <p class="book-meta">
+                                    Borrowed Date: {{ $history->borrowed_date ?? '-' }}
+                                </p>
+
+                                <p class="book-meta">
+                                    Due Date: {{ $history->due_date ?? '-' }}
+                                </p>
+                            </div>
+
+                            @if ($history->bookCopy && $history->bookCopy->bookMetadata)
+                            <a
+                                href="{{ route('book.show', $history->bookCopy->bookMetadata->id) }}"
+                                class="book-link">
+                                View Detail
+                            </a>
+                            @endif
                         </div>
+                        @endforeach
+                    </div>
                     @else
-                        <div class="empty-box">
-                            You have no borrowing history yet.
-                        </div>
+                    <div class="empty-box">
+                        You have no borrowing history yet.
+                    </div>
                     @endif
 
                     @if ($historyPage && $historyPage->hasPages())
-                        <div class="pagination-wrapper">
-                            {{ $historyPage->links() }}
-                        </div>
-                    @endif
-                </section>
-            @elseif ($isResultMode)
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            @if ($keyword)
-                                <h1 class="section-title">Search result for "{{ $keyword }}"</h1>
-                                <p class="section-subtitle">Showing books by {{ ucfirst($searchBy) }}</p>
-                            @elseif ($currentCategory)
-                                <h1 class="section-title">{{ $currentCategory->name }}</h1>
-                                <p class="section-subtitle">Showing books in this category</p>
-                            @else
-                                <h1 class="section-title">Books</h1>
-                            @endif
-                        </div>
+                    <div class="pagination-wrapper">
+                        {{ $historyPage->links() }}
                     </div>
+                    @endif
+            </section>
+            @elseif ($isResultMode)
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        @if ($keyword)
+                        <h1 class="section-title">Search result for "{{ $keyword }}"</h1>
+                        <p class="section-subtitle">Showing books by {{ ucfirst($searchBy) }}</p>
+                        @elseif ($currentCategory)
+                        <h1 class="section-title">{{ $currentCategory->name }}</h1>
+                        <p class="section-subtitle">Showing books in this category</p>
+                        @else
+                        <h1 class="section-title">Books</h1>
+                        @endif
+                    </div>
+                </div>
 
-                    @if ($books->count() > 0)
-                        <div class="book-grid">
-                            @foreach ($books as $book)
-                                <div class="book-card">
-                                    <div>
-                                        <h3 class="book-title">{{ $book->title }}</h3>
-                                        <p class="book-meta">Author: {{ $book->author }}</p>
-                                        <p class="book-meta">Publisher: {{ $book->publisher ?? '-' }}</p>
-                                        <p class="book-meta">Category: {{ $book->bookCategory->name ?? '-' }}</p>
+                @if ($books->count() > 0)
+                <div class="book-grid">
+                    @foreach ($books as $book)
+                    <div class="book-card">
+                        <div>
+                            <div>
+                                <div class="book-image-wrapper">
+                                    @if (!empty($book->image))
+                                    <img
+                                        src="{{ asset('storage/' . $book->image) }}"
+                                        alt="{{ $book->title }}"
+                                        class="book-image">
+                                    @else
+                                    <div class="book-image-placeholder">
+                                        No Image
                                     </div>
-
-                                    <a href="{{ route('book.show', $book->id) }}" class="book-link">
-                                        View Detail
-                                    </a>
+                                    @endif
                                 </div>
-                            @endforeach
+                                <h3 class="book-title">{{ $book->title }}</h3>
+                                <p class="book-meta">Author: {{ $book->author }}</p>
+                                <p class="book-meta">Publisher: {{ $book->publisher ?? '-' }}</p>
+                                <p class="book-meta">Category: {{ $book->bookCategory->name ?? '-' }}</p>
+                            </div>
+
+                            <a href="{{ route('book.show', $book->id) }}" class="book-link">
+                                View Detail
+                            </a>
                         </div>
+                        @endforeach
+                    </div>
                     @else
-                        <div class="empty-box">
-                            No books found.
-                        </div>
+                    <div class="empty-box">
+                        No books found.
+                    </div>
                     @endif
 
                     @if ($books && $books->hasPages())
-                        <div class="pagination-wrapper">
-                            {{ $books->links() }}
-                        </div>
-                    @endif
-                </section>
-            @else
-                @can('is-member')
-                    @if (count($histories) > 0)
-                        <section class="section">
-                            <div class="section-header">
-                                <h1 class="section-title">History</h1>
-                                <a href="{{ route('home', ['view' => 'history']) }}" class="see-all">See All</a>
-                            </div>
-
-                            @php
-                                $historyLast = $histories->take(4)
-                            @endphp
-
-                            <div class="book-grid">
-                                @foreach ($historyLast as $history)
-                                    <div class="book-card">
-                                        <div>
-                                            <h3 class="book-title">
-                                                {{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}
-                                            </h3>
-
-                                            <p class="book-meta">
-                                                Borrowed Date: {{ $history->borrowed_date ?? '-' }}
-                                            </p>
-
-                                            <p class="book-meta">
-                                                Due Date: {{ $history->due_date ?? '-' }}
-                                            </p>
-
-                                            <p class="book-meta">
-                                                Status: {{ $history->status ?? '-' }}
-                                            </p>
-                                        </div>
-
-                                        @if ($history->bookCopy && $history->bookCopy->bookMetadata)
-                                            <a
-                                                href="{{ route('book.show', $history->bookCopy->bookMetadata->id) }}"
-                                                class="book-link"
-                                            >
-                                                View Detail
-                                            </a>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        </section>
-                    @endif
-                @endcan
-
-                <section class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">Latest Arrivals</h1>
+                    <div class="pagination-wrapper">
+                        {{ $books->links() }}
                     </div>
-
-                    @if ($latestArrivals->count() > 0)
-                        <div class="book-grid">
-                            @foreach ($latestArrivals as $book)
-                                <div class="book-card">
-                                    <div>
-                                        <h3 class="book-title">{{ $book->title }}</h3>
-                                        <p class="book-meta">Author: {{ $book->author }}</p>
-                                        <p class="book-meta">Publisher: {{ $book->publisher ?? '-' }}</p>
-                                        <p class="book-meta">Category: {{ $book->bookCategory->name ?? '-' }}</p>
-                                    </div>
-
-                                    <a href="{{ route('book.show', $book->id) }}" class="book-link">
-                                        View Detail
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="empty-box">
-                            No latest arrivals yet.
-                        </div>
                     @endif
-                </section>
+            </section>
+            @else
+            @can('is-member')
+            @if (count($histories) > 0)
+            <section class="section">
+                <div class="section-header">
+                    <h1 class="section-title">History</h1>
+                    <a href="{{ route('home', ['view' => 'history']) }}" class="see-all">See All</a>
+                </div>
+
+                @php
+                $historyLast = $histories->take(4)
+                @endphp
+
+                <div class="book-grid">
+                    @foreach ($historyLast as $history)
+                    <div class="book-card">
+                        <div>
+                            <div>
+                                <div class="book-image-wrapper">
+                                    @if (!empty($history->bookCopy->bookMetadata->image))
+                                    <img
+                                        src="{{ asset('storage/' . $history->bookCopy->bookMetadata->image) }}"
+                                        alt="{{ $history->bookCopy->bookMetadata->image }}"
+                                        class="book-image">
+                                    @else
+                                    <div class="book-image-placeholder">
+                                        No Image
+                                    </div>
+                                    @endif
+                                </div>
+                                <h3 class="book-title">
+                                    {{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}
+                                </h3>
+
+                                <p class="book-meta">
+                                    Borrowed Date: {{ $history->borrowed_date ?? '-' }}
+                                </p>
+
+                                <p class="book-meta">
+                                    Due Date: {{ $history->due_date ?? '-' }}
+                                </p>
+                            </div>
+
+                            @if ($history->bookCopy && $history->bookCopy->bookMetadata)
+                            <a
+                                href="{{ route('book.show', $history->bookCopy->bookMetadata->id) }}"
+                                class="book-link">
+                                View Detail
+                            </a>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+            </section>
+            @endif
+            @endcan
+
+            <section class="section">
+                <div class="section-header">
+                    <h1 class="section-title">Latest Arrivals</h1>
+                </div>
+
+                @if ($latestArrivals->count() > 0)
+                <div class="book-grid">
+                    @foreach ($latestArrivals as $book)
+                    <div class="book-card">
+                        <div>
+                            <div>
+                                <div class="book-image-wrapper">
+                                    @if (!empty($book->image))
+                                    <img
+                                        src="{{ asset('storage/' . $book->image) }}"
+                                        alt="{{ $book->title }}"
+                                        class="book-image">
+                                    @else
+                                    <div class="book-image-placeholder">
+                                        No Image
+                                    </div>
+                                    @endif
+                                </div>
+                                <h3 class="book-title">{{ $book->title }}</h3>
+                                <p class="book-meta">Author: {{ $book->author }}</p>
+                                <p class="book-meta">Publisher: {{ $book->publisher ?? '-' }}</p>
+                                <p class="book-meta">Category: {{ $book->bookCategory->name ?? '-' }}</p>
+                            </div>
+
+                            <a href="{{ route('book.show', $book->id) }}" class="book-link">
+                                View Detail
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="empty-box">
+                        No latest arrivals yet.
+                    </div>
+                    @endif
+            </section>
             @endif
         </div>
     </div>

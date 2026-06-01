@@ -14,23 +14,13 @@ class BorrowedLogController extends Controller
 {
     public function create()
     {
-        // Fetch active members and available book copies for the form
-        $members = User::where('is_admin', false)
-            ->where('status', 'active')
-            ->orderBy('name')
-            ->get();
-
-        $availableCopies = BookCopy::with('bookMetadata')
-            ->where('status', 'available')
-            ->latest()
-            ->get();
-
+        // Fetch borrowed histories with related user and book copy data, ordered by most recent
         $histories = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
             ->latest()
             ->take(20)
             ->get();
 
-        return view('admin.issue.index', compact('members', 'availableCopies', 'histories'));
+        return view('admin.issue.index', compact('histories'));
     }
 
 
@@ -110,21 +100,14 @@ class BorrowedLogController extends Controller
     //  Show the form to return a book
     public function returnForm()
     {
-        $borrowedLogs = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
-            ->whereNull('returned_date')
-            ->whereHas('bookCopy', function ($query) {
-                $query->where('status', 'borrowed');
-            })
-            ->latest()
-            ->get();
-
+        // Fetch currently borrowed books with related user and book copy data, ordered by most recent
         $returnHistories = BorrowedLog::with(['user', 'bookCopy.bookMetadata'])
             ->whereNotNull('returned_date')
             ->latest()
             ->take(20)
             ->get();
 
-        return view('admin.return.index', compact('borrowedLogs', 'returnHistories'));
+        return view('admin.return.index', compact('returnHistories'));
     }
 
     // Handle the returning of a book
@@ -141,8 +124,16 @@ class BorrowedLogController extends Controller
             ->whereHas('bookCopy', function ($query) {
                 $query->where('status', 'borrowed');
             })
-            ->findOrFail($validated['borrowed_log_id']);
+            ->where('id', $validated['borrowed_log_id'])
+            ->first();
 
+        if (!$borrowedLog) {
+            return back()
+                ->withErrors([
+                    'borrowed_log_id' => 'Borrowed log not found or the book has already been returned.',
+                ])
+                ->withInput();
+        }
         //  Use a transaction to ensure data integrity when updating the borrowed log and book copy status
         DB::transaction(function () use ($validated, $borrowedLog) {
             $borrowedLog->update([

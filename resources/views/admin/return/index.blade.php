@@ -179,31 +179,26 @@
             <p class="page-subtitle">Record a book return transaction.</p>
 
             @if (session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
+            <div class="success-message">
+                {{ session('success') }}
+            </div>
             @endif
 
             <form method="POST" action="{{ route('admin.borrowed-logs.return-store') }}">
                 @csrf
 
                 <div class="form-group">
-                    <label for="borrowed_log_id" class="form-label">Borrowed Book</label>
-                    <select name="borrowed_log_id" id="borrowed_log_id" class="form-select">
-                        <option value="">Select borrowed book</option>
-
-                        @foreach ($borrowedLogs as $log)
-                            <option value="{{ $log->id }}" {{ old('borrowed_log_id') == $log->id ? 'selected' : '' }}>
-                                Log ID: {{ $log->id }} -
-                                Member: {{ $log->user->name ?? 'Unknown Member' }} -
-                                Copy ID: {{ $log->bookCopy->id ?? '-' }} -
-                                Book: {{ $log->bookCopy->bookMetadata->title ?? 'Unknown Book' }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label for="borrowed_log_id" class="form-label">Borrowed Log ID</label>
+                    <input
+                        type="number"
+                        name="borrowed_log_id"
+                        id="borrowed_log_id"
+                        value="{{ old('borrowed_log_id') }}"
+                        class="form-input"
+                        placeholder="Enter borrowed log ID">
 
                     @error('borrowed_log_id')
-                        <p class="error-message">{{ $message }}</p>
+                    <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -214,11 +209,10 @@
                         name="returned_date"
                         id="returned_date"
                         value="{{ old('returned_date', date('Y-m-d')) }}"
-                        class="form-input"
-                    >
+                        class="form-input">
 
                     @error('returned_date')
-                        <p class="error-message">{{ $message }}</p>
+                    <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -233,35 +227,35 @@
             <h2 class="history-title">Return History</h2>
 
             @if ($returnHistories->count() > 0)
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Member ID</th>
-                            <th>Member Name</th>
-                            <th>Book Copy ID</th>
-                            <th>Book Name</th>
-                            <th>Borrowed Date</th>
-                            <th>Returned Date</th>
-                        </tr>
-                    </thead>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Member ID</th>
+                        <th>Member Name</th>
+                        <th>Book Copy ID</th>
+                        <th>Book Name</th>
+                        <th>Borrowed Date</th>
+                        <th>Returned Date</th>
+                    </tr>
+                </thead>
 
-                    <tbody>
-                        @foreach ($returnHistories as $history)
-                            <tr>
-                                <td>{{ $history->user->id ?? '-' }}</td>
-                                <td>{{ $history->user->name ?? 'Unknown Member' }}</td>
-                                <td>{{ $history->bookCopy->id ?? '-' }}</td>
-                                <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
-                                <td>{{ $history->borrowed_date ?? '-' }}</td>
-                                <td>{{ $history->returned_date ?? '-' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <tbody>
+                    @foreach ($returnHistories as $history)
+                    <tr>
+                        <td>{{ $history->user->id ?? '-' }}</td>
+                        <td>{{ $history->user->name ?? 'Unknown Member' }}</td>
+                        <td>{{ $history->bookCopy->id ?? '-' }}</td>
+                        <td>{{ $history->bookCopy->bookMetadata->title ?? 'Unknown Book' }}</td>
+                        <td>{{ $history->borrowed_date ?? '-' }}</td>
+                        <td>{{ $history->returned_date ?? '-' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
             @else
-                <div class="empty-message">
-                    No return history yet.
-                </div>
+            <div class="empty-message">
+                No return history yet.
+            </div>
             @endif
         </div>
     </div>

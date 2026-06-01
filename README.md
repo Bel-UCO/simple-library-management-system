@@ -289,8 +289,8 @@ Project ini sudah menyediakan akun admin melalui seeder.
 Gunakan akun berikut untuk login sebagai admin:
 
 ```text
-Email: admin@example.com
-Password: password123
+Email: admin@mail.com
+Password: password
 ```
 
 Admin dapat mengakses fitur pengelolaan data seperti kategori, buku, member, peminjaman, dan pengembalian.

@@ -10,7 +10,7 @@ class BookCategoryController extends Controller
     // Display a list of all book categories
     public function index()
     {
-        $categories = BookCategory::latest()->get();
+        $categories = BookCategory::orderBy('name')->get();
 
         return view('categories.index', compact('categories'));
     }
